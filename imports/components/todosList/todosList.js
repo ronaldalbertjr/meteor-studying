@@ -21,6 +21,19 @@ class TodosListCtrl
       Tasks.insert({text: newTask, createdAt: new Date});
       this.newTask = '';
     }
+    setChecked(task)
+    {
+      Tasks.update(task._id, {
+          $set:{
+           checked: !task.checked
+         },
+       });
+    }
+
+    removeTask(task)
+    {
+      Tasks.remove(task._id);
+    }
 }
 export default angular.module('todosList', [
   angularMeteor
