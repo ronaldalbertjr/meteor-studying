@@ -8,14 +8,28 @@ class TodosListCtrl
 {
     constructor($scope) 
     {
-    $scope.viewModel(this);
-    this.helpers(
-    {
-      tasks() 
+      $scope.viewModel(this);
+
+      this.hideCompleted = false;
+
+      this.helpers(
       {
-        return Tasks.find({}, {sort: {createdAt: -1}});
-      }
-    })
+        tasks() 
+        {
+          const selector = {};
+
+          if(this.getReactively('hideCompleted'))
+          {
+            selector.checked = { $ne: true };
+          }
+          return Tasks.find(selector, {sort: {createdAt: -1}});
+        },
+
+        incompleteCount()
+        {
+          return Tasks.find({checked: {$ne: true}}).count();
+        }
+      })
     }
     addTask(newTask){
       Tasks.insert({text: newTask, createdAt: new Date});
