@@ -2,6 +2,7 @@ import angular from 'angular';
 import angularMeteor from 'angular-meteor';
 import template from './todosList.html';
 import { Tasks } from '../../api/tasks.js';
+import { Meteor } from 'meteor/meteor';
  
 // EU sou o ronald
 class TodosListCtrl 
@@ -9,6 +10,8 @@ class TodosListCtrl
     constructor($scope) 
     {
       $scope.viewModel(this);
+
+      this.subscribe('tasks');
 
       this.hideCompleted = false;
 
@@ -28,13 +31,21 @@ class TodosListCtrl
         incompleteCount()
         {
           return Tasks.find({checked: {$ne: true}}).count();
+        },
+
+        currentUser()
+        {
+          return Meteor.user();
         }
       })
     }
-    addTask(newTask){
-      Tasks.insert({text: newTask, createdAt: new Date});
+
+    addTask(newTask)
+    {
+      Meteor.call('tasks.setChecked', task._id, !task.checked);
       this.newTask = '';
     }
+
     setChecked(task)
     {
       Tasks.update(task._id, {
@@ -46,7 +57,12 @@ class TodosListCtrl
 
     removeTask(task)
     {
-      Tasks.remove(task._id);
+      Meteor.call('tasks.remove', task._id);
+    }
+
+    setPrivate(task)
+    {
+      Meteor.call('tasks.setPrivate', task._id, !task.private);
     }
 }
 export default angular.module('todosList', [
